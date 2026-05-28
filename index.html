@@ -21,6 +21,11 @@
     .done-item { background-color: #e8f5e9; font-style: italic; color: #2e7d32; }
     .text-note { font-size: 11px; color: #ff6f00; display: block; font-weight: 500; }
     #reader { width: 100%; background: #000; border-radius: 12px; overflow: hidden; position: relative; min-height: 250px; display: none; }
+    
+    /* Lớp bổ sung hỗ trợ hiển thị phụ đề tiếng anh chuẩn như hình mẫu */
+    .eng-sub { display: block; color: #2e7d32; font-style: italic; font-weight: normal; font-size: 13px; margin-top: 2px; }
+    .btn-custom-cam { background-color: #e8f5e9 !important; color: #1b5e20 !important; border: 1px solid #c8e6c9 !important; font-weight: bold; }
+    .btn-custom-cam:disabled { background-color: #f5f5f5 !important; color: #a6acaf !important; border: 1px solid #d5dbdb !important; }
   </style>
 </head>
 <body>
@@ -35,22 +40,24 @@
   </div>
  
   <div class="mb-3 position-relative mt-3">
-    <label class="form-label fw-bold text-secondary">Công thức đang sản xuất</label>
+    <label class="form-label fw-bold text-dark mb-0">Công thức đang sản xuất</label>
+    <span class="eng-sub mb-2">Production Formula</span>
     <input type="text" class="form-control form-control-lg" id="formula" placeholder="🔍 Gõ để tìm công thức..." autocomplete="off">
     <ul id="formulaList" class="list-group position-absolute w-100 d-none" style="z-index:1000; max-height:200px; overflow-y:auto;"></ul>
   </div>
  
   <div id="progressContainer" class="progress-box d-none">
-    <div class="fw-bold mb-2 text-dark border-bottom pb-1">📋 Tiến độ nạp nguyên liệu:</div>
+    <div class="fw-bold text-dark">📋 Trình tự nạp nguyên liệu:</div>
+    <span class="eng-sub mb-2 border-bottom pb-1">Material Charging Progress:</span>
     <div id="bomList"></div>
   </div>
  
   <div class="d-grid gap-2 my-3">
-    <button class="btn btn-primary btn-lg" id="btnStartCam" onclick="startCameraDirectly()" disabled>
-      📷 Bật Camera Quét QR
+    <button class="btn btn-custom-cam btn-lg shadow-sm" id="btnStartCam" onclick="startCameraDirectly()" disabled>
+      📷 Bật Camera Quét QR<br><span style="font-size: 14px; font-style: italic; font-weight: normal;">Turn on QR Camera</span>
     </button>
-    <button class="btn btn-danger btn-lg d-none" id="btnStopCam" onclick="stopCameraDirectly()">
-      🛑 Tắt Camera
+    <button class="btn btn-danger btn-lg d-none shadow-sm" id="btnStopCam" onclick="stopCameraDirectly()">
+      🛑 Tắt Camera<br><span style="font-size: 14px; font-style: italic; font-weight: normal;">Turn off QR Camera</span>
     </button>
   </div>
  
@@ -65,7 +72,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
  
 <script>
-  // 🟢 ĐƯỜNG LINK WEB APP CHUẨN ĐÃ ĐƯỢC GIỮ NGUYÊN CHÍNH XÁC 🟢
+  // 🟢 ĐƯỜNG LINK WEB APP CHUẨN ĐƯỢC GIỮ NGUYÊN TUYỆT ĐỐI KHÔNG THAY ĐỔI 🟢
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFtKD-FUgS676OIp485eUPMMArv7BsSJcD1RGoDZhdk1Bo33OmYg8KEgSHRR3ta6N0Dg/exec"; 
 
   let html5Qrcode;
@@ -154,18 +161,18 @@
           const remainder = parseFloat((item.reqWeight % item.packSize).toFixed(2));
           let noteHtml = ``;
           
-          // CHỈNH SỬA TRƯỜNG HỢP 1: HIỂN THỊ SONG NGỮ KHI CÓ BAO LẺ / TIẾNG VIỆT KHI FULL BAG
+          // ĐIỀU CHỈNH 1: XỬ LÝ SONG NGỮ KHI CÓ BAO LẺ / CHỈ TIẾNG VIỆT KHI FULL BAG
           if (remainder > 0) {
-            noteHtml = `(${fullBagsCount} bao nguyên + 1 bao lẻ ${remainder}kg)<br><span style="color: #1b5e20; font-style: italic; font-weight: normal; font-size: 0.95em;">(${fullBagsCount} full bag(s) + 1 partial bag ${remainder}kg)</span>`;
+            noteHtml = `(${fullBagsCount} bao nguyên + 1 bao lẻ ${remainder}kg)<br><span style="color: #2e7d32; font-style: italic; font-weight: normal; display: block; margin-top: 1px;">(${fullBagsCount} full bag(s) + 1 partial bag ${remainder}kg)</span>`;
           } else {
             noteHtml = `(${item.packSize}kg/bao)`;
           }
 
-          // CHỈNH SỬA TRƯỜNG HỢP 2: ĐỊNH DẠNG SỐ LƯỢNG BAO THUẦN VIỆT KHÔNG CÓ CHỮ /BAGS
+          // ĐIỀU CHỈNH 2: ĐỊNH DẠNG SỐ LƯỢNG BAO CHỈ HIỂN THỊ TIẾNG VIỆT "X/Y bao" KHÔNG CÓ CHỮ /BAGS
           div.innerHTML = `
             <div style="max-width: 70%;">
               <strong class="d-block">${item.name}</strong>
-              <small class="text-muted d-block">Mã: ${item.code} | Tổng: ${item.reqWeight}kg</small>
+              <small class="text-muted d-block">Mã/Code: ${item.code} | Tổng/Total: ${item.reqWeight}kg</small>
               <span class="text-note">${noteHtml}</span>
             </div>
             <div>
@@ -210,7 +217,7 @@
           onScanSuccess,
           onScanFailure
         ).catch(err => {
-          swal("Lỗi camera", "Không thể kích hoạt luồng camera phần cứng.", "error");
+          swal("Lỗi khởi động", "Không thể kích hoạt luồng camera. Vui lòng kiểm tra lại quyền thiết bị!", "error");
           stopCameraDirectly();
         });
       } else {
@@ -218,7 +225,7 @@
         stopCameraDirectly();
       }
     }).catch(err => {
-      swal("Yêu cầu quyền", "Vui lòng cấp quyền truy cập Camera cho trang web GitHub này!", "error");
+      swal("Yêu cầu quyền", "Vui lòng cấp quyền truy cập Camera cho trang web này!", "error");
       stopCameraDirectly();
     });
   }
@@ -255,19 +262,19 @@
       hideLoading();
       if (res.status === "GREAT") {
         if (res.isPartialBag) {
-          // NẾU LÀ BAO LẺ: POPUP SẼ ĐƯỢC CHUYỂN SANG SONG NGỮ ĐỂ CẢNH BÁO CÔNG NHÂN CẨN THẬN
+          // Báo bao lẻ dạng song ngữ đồng bộ
           swal({
             title: `⚠️ CHÚ Ý: BAO LẺ [${res.currentBag}/${res.totalBags}]`,
-            text: `Nguyên liệu: ${res.materialName}\n👉 VUI LÒNG CÂN LẺ ĐÚNG: ${res.partialWeight} KG\n(Không đổ hết cả bao!)\n\n----------------------------------------\n\n⚠️ ATTENTION: PARTIAL BAG [${res.currentBag}/${res.totalBags}]\nMaterial: ${res.materialName}\n👉 PLEASE WEIGH EXACTLY: ${res.partialWeight} KG\n(Do not pour the entire bag!)`,
+            text: `Nguyên liệu: ${res.materialName}\n👉 VUI LÒNG CÂN LẺ ĐÚNG: ${res.partialWeight} KG\n(Không đổ hết cả bao!)\n\n---------------------------------------\n\n⚠️ ATTENTION: PARTIAL BAG [${res.currentBag}/${res.totalBags}]\nMaterial: ${res.materialName}\n👉 PLEASE WEIGH EXACTLY: ${res.partialWeight} KG\n(Do not pour the entire bag!)`,
             icon: "warning",
             closeOnClickOutside: false,
-            button: "Đã hiểu và đã cân đúng lẻ / Understood"
+            button: "Đã cân đúng lẻ / Understood"
           }).then(() => {
             loadFormulaProgress(formula);
             isProcessingScan = false; 
           });
         } else {
-          // NẾU LÀ BAO NGUYÊN: CHỈ HIỂN THỊ TIẾNG VIỆT GỌN ĐẸP KHÔNG RỐI MẮT
+          // Báo bao nguyên dạng Tiếng Việt tinh gọn
           swal({
             title: `THÀNH CÔNG ✅ [${res.currentBag}/${res.totalBags}]`,
             text: `Xác nhận: ${res.materialName}\nHãy nạp 1 bao NGUYÊN (${res.packSize} kg).`,
