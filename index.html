@@ -21,8 +21,8 @@
     .text-note { font-size: 11px; color: #ff6f00; display: block; font-weight: 500; margin-top: 2px; }
     #reader { width: 100%; background: #000; border-radius: 12px; overflow: hidden; position: relative; min-height: 250px; display: none; }
     
-    /* ĐỊNH DẠNG TIẾNG ANH: XANH LÁ CÂY ĐẬM + CHỮ NGHIÊNG */
-    .en-txt { color: #1b5e20 !important; font-style: italic !important; font-weight: normal !important; font-size: 0.9em; display: block; margin-top: 1px; }
+    /* STYLE ĐỊNH DẠNG TIẾNG ANH SONG NGỮ */
+    .en-txt { color: #1b5e20 !important; font-style: italic !important; font-weight: normal !important; font-size: 0.88em; display: block; margin-top: 1px; }
   </style>
 </head>
 <body>
@@ -65,11 +65,10 @@
   </div>
 </div>
  
-<!-- DÙNG SWEETALERT 2 ĐỂ HỖ TRỢ ĐỔI MÀU CHỮ TRONG HỘP THOẠI QUÉT BAO LẺ -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  
 <script>
-  // 🟢 ĐƯỜNG LINK WEB APP CHUẨN CỦA BẠN ĐÃ ĐƯỢC LƯU SẴN TRỰC TIẾP TẠI ĐÂY 🟢
+  // 🟢 ĐƯỜNG LINK WEB APP CHUẨN ĐÃ ĐƯỢC GIỮ NGUYÊN CHÍNH XÁC 🟢
   const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFtKD-FUgS676OIp485eUPMMArv7BsSJcD1RGoDZhdk1Bo33OmYg8KEgSHRR3ta6N0Dg/exec"; 
 
   let html5Qrcode;
@@ -93,20 +92,12 @@
       if (res.status === "SUCCESS") {
         allFormulas = res.data;
       } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Lỗi dữ liệu / <span class="en-txt">Data error</span>',
-          html: 'Không thể lấy danh sách công thức.'
-        });
+        Swal.fire({ icon: 'error', title: 'Lỗi dữ liệu', text: 'Không thể lấy danh sách công thức' });
       }
     })
     .catch(err => {
       hideLoading();
-      Swal.fire({
-        icon: 'error',
-        title: 'Lỗi Hệ Thống / <span class="en-txt">System Error</span>',
-        html: 'Không thể kết nối đến máy chủ Google Sheets.'
-      });
+      Swal.fire({ icon: 'error', title: 'Lỗi Hệ Thống', text: 'Không thể kết nối đến máy chủ Google Sheets' });
     });
   });
  
@@ -143,7 +134,7 @@
     .then(res => {
       hideLoading();
       if (res.status !== "SUCCESS") {
-        Swal.fire({ icon: 'error', title: 'Lỗi', html: 'Không thể tải tiến độ.' });
+        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể tải tiến độ' });
         return;
       }
       
@@ -161,21 +152,21 @@
           const div = document.createElement("div");
           const isDone = item.scannedBags >= item.reqBags;
           div.className = `material-item ${isDone ? 'done-item px-2 rounded' : ''}`;
-          
+         
           const fullBagsCount = Math.floor(item.reqWeight / item.packSize);
           const remainder = parseFloat((item.reqWeight % item.packSize).toFixed(2));
           let noteHtml = ``;
           
-          // Kiểm tra điều kiện bao lẻ theo yêu cầu của bạn
+          // BỘ LỌC ĐIỀU KIỆN HIỂN THỊ THEO YÊU CẦU CỦA BẠN
           if (remainder > 0) {
-            // Trường hợp CÓ BAO LẺ -> Hiển thị SONG NGỮ định dạng chuẩn
+            // Trường hợp CÓ BAO LẺ -> Bật tính năng hiển thị SONG NGỮ
             noteHtml = `(${fullBagsCount} bao nguyên + 1 bao lẻ ${remainder}kg)<br><span class="en-txt">(${fullBagsCount} full bags + 1 partial bag ${remainder}kg)</span>`;
           } else {
-            // Trường hợp CHỈ CÓ BAO NGUYÊN (Full Bag) -> Chỉ hiển thị TIẾNG VIỆT thuần túy
+            // Trường hợp CHỈ CÓ BAO NGUYÊN -> Chỉ hiển thị TIẾNG VIỆT thuần túy gọn đẹp
             noteHtml = `(${item.packSize}kg/bao)`;
           }
-         
-          // Tên nguyên liệu giữ nguyên gốc 100% từ file Sheets. Badge hiển thị thuần Việt "X/Y bao"
+
+          // Badge đếm số lượng bao đã loại bỏ hoàn toàn chữ "/bags", chỉ hiển thị "X/Y bao" thuần Việt
           div.innerHTML = `
             <div style="max-width: 72%;">
               <strong class="d-block">${item.name}</strong>
@@ -193,12 +184,12 @@
       } else {
         container.classList.add("d-none");
         btnStartCam.disabled = true;
-        Swal.fire({ icon: 'info', title: 'Thông báo', html: 'Công thức chưa có nguyên liệu Hoạt động!' });
+        Swal.fire({ icon: 'info', title: 'Thông báo', text: 'Công thức chưa có nguyên liệu Hoạt động!' });
       }
     })
     .catch(err => {
       hideLoading(); 
-      Swal.fire({ icon: 'error', title: 'Lỗi', html: 'Mất kết nối khi tải dữ liệu công thức.' }); 
+      Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Mất kết nối khi tải dữ liệu công thức' }); 
     });
   }
  
@@ -224,15 +215,15 @@
           onScanSuccess,
           onScanFailure
         ).catch(err => {
-          Swal.fire({ icon: 'error', title: 'Lỗi camera', html: 'Không thể kích hoạt luồng camera phần cứng.' });
+          Swal.fire({ icon: 'error', title: 'Lỗi camera', text: 'Không thể kích hoạt luồng camera phần cứng.' });
           stopCameraDirectly();
         });
       } else {
-        Swal.fire({ icon: 'error', title: 'Lỗi thiết bị', html: 'Không tìm thấy hệ thống camera khả dụng.' });
+        Swal.fire({ icon: 'error', title: 'Lỗi thiết bị', text: 'Không tìm thấy camera khả dụng nào.' });
         stopCameraDirectly();
       }
     }).catch(err => {
-      Swal.fire({ icon: 'error', title: 'Cấp quyền', html: 'Vui lòng cho phép trình duyệt truy cập camera!' });
+      Swal.fire({ icon: 'error', title: 'Yêu cầu quyền', text: 'Vui lòng cấp quyền truy cập Camera cho trang web!' });
       stopCameraDirectly();
     });
   }
@@ -269,19 +260,19 @@
       hideLoading();
       if (res.status === "GREAT") {
         if (res.isPartialBag) {
-          // Trường hợp quét trúng bao lẻ -> Báo động SONG NGỮ bắt mắt
+          // Khi quét trúng bao lẻ -> Hộp thoại tự động bật chế độ SONG NGỮ cảnh báo lớn
           Swal.fire({
             title: `⚠️ CHÚ Ý: BAO LẺ [${res.currentBag}/${res.totalBags}]<br><span class="en-txt">ATTENTION: PARTIAL BAG</span>`,
-            html: `Nguyên liệu / <span class="en-txt">Material</span>: <strong>${res.materialName}</strong><br><br>👉 VUI LÒNG CÂN LẺ ĐÚNG: <span style="color:red; font-weight:bold; font-size:1.2em;">${res.partialWeight} KG</span><br><span class="en-txt">PLEASE WEIGH EXACTLY: ${res.partialWeight} KG</span><br><br>(Không đổ hết cả bao! / <span class="en-txt">Do not pour the entire bag!</span>)`,
+            html: `Nguyên liệu / <span class="en-txt">Material</span>: <strong>${res.materialName}</strong><br><br>👉 VUI LÒNG CÂN LẺ ĐÚNG: <span style="color:red; font-weight:bold; font-size:1.25em;">${res.partialWeight} KG</span><br><span class="en-txt">PLEASE WEIGH EXACTLY: ${res.partialWeight} KG</span><br><br>(Không đổ hết cả bao! / <span class="en-txt">Do not pour the entire bag!</span>)`,
             icon: "warning",
             allowOutsideClick: false,
-            confirmButtonText: 'Đã hiểu và đã cân lẻ / Understood'
+            confirmButtonText: 'Đã hiểu và đã cân đúng lẻ / Understood'
           }).then(() => {
             loadFormulaProgress(formula);
             isProcessingScan = false; 
           });
         } else {
-          // Trường hợp bao nguyên thông thường -> Hiện thông báo TIẾNG VIỆT thuần túy gọn đẹp
+          // Khi quét trúng bao nguyên thông thường -> Chỉ hiển thị thông báo TIẾNG VIỆT thuần túy tinh gọn
           Swal.fire({
             title: `THÀNH CÔNG ✅ [${res.currentBag}/${res.totalBags}]`,
             html: `Xác nhận: <strong>${res.materialName}</strong><br><br>Hãy nạp 1 bao NGUYÊN (${res.packSize} kg).`,
@@ -297,7 +288,7 @@
         Swal.fire({
           icon: 'error',
           title: 'THẤT BẠI ❌',
-          html: res.message.replace(/<br>.*$/g, '') // Chỉ lấy phần text thông báo Tiếng Việt từ máy chủ chuyển về
+          html: res.message.replace(/<br>.*$/g, '')
         }).then(() => { 
           isProcessingScan = false; 
         });
@@ -305,11 +296,7 @@
     })
     .catch(err => {
       hideLoading();
-      Swal.fire({
-        icon: 'error',
-        title: 'Lỗi mạng',
-        html: 'Mất liên lạc với máy chủ Google Sheets.'
-      }).then(() => { 
+      Swal.fire({ icon: 'error', title: 'Lỗi mạng', text: 'Mất liên lạc với máy chủ Google Sheets' }).then(() => { 
         isProcessingScan = false; 
       });
     });
